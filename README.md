@@ -11,7 +11,7 @@ models increases power to identify CpG site-phenotype associations. Under Review
 
 ## Step 1: Download DNAm prediction models
 
-The MIMOSA models are available on Zenodo (DOI: 10.5281/zenodo.7325055).  The files included are _cg********.rds_, which each consist of a set of weights for SNPs used in predicting DNAm at the CpG site cg*********.  Once you load one of these files into R, you'll have a list with elements 1) a dataframe with (among other things) mQTL p-value, rsID, chromosome, position (of SNP), a1, a2, CpG site, and position of CpG site; 2) a set of DNAm prediction weights corresponding to the SNPs in 1); 3) the prediction accuracy (R^2) of the model for the CpG site in the test dataset (which comes from the Framingham Heart Study).  Once you have the weights, you're halfway to running your MWAS.
+The MIMOSA models for DNAm prediction in whole bllod are available on osf.io [here](https://osf.io/4swdq/?view_only=1e824972813a40e78d5af25f4b2c7154).  The files included are _cg********.rds_, which each consist of a set of weights for SNPs used in predicting DNAm at the CpG site cg*********.  Once you load one of these files into R, you'll have a list with elements 1) a dataframe with (among other things) mQTL p-value, rsID, chromosome, position (of SNP), a1, a2, CpG site, and position of CpG site; 2) a set of DNAm prediction weights corresponding to the SNPs in 1); 3) the prediction accuracy (R^2) of the model for the CpG site in the test dataset (which comes from the Framingham Heart Study).  Once you have the weights, you're halfway to running your MWAS.
 
 ## Step 2: Prepare GWAS Summary Statistics
 
