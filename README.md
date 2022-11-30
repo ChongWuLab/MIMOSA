@@ -23,29 +23,37 @@ The GWAS summary statistics you use for your MWAS will need to be in the correct
 
 ### APSS.R
 
-_APSS.R_ is an interactive R function that helps you easily process and shape GWAS summary statistics.  There are 3 main arguments: 1) _directory.working_ is simply your current working directory; 2) _filename_ is the name of the GWAS summary statistics file to process; 3) _BIG_ is the maximum number of GBs that will be __fully__ loaded in and worked with (default argument is 2).  If the size of the GWAS summary statistics file is larger than _BIG_, _APSS.R_ will perform an exploratory read of the data first.  This will hopefully shorten runtime and handle GWAS summary statistics files larger than 10 GBs.
-
-The code provided below to create DNAm prediction models relies on specific, processed data.  We cannot provide all of the data due to privacy concerns, but we can provide a list of the used datasets.  Please reach out if you need assistance preparing data.
+_APSS.R_ is an interactive R function that helps you easily process and shape GWAS summary statistics.  There are 3 main arguments: 1) _directory.working_ is simply your current working directory. 2) _filename_ is the name of the GWAS summary statistics file to process. 3) _BIG_ is the maximum number of GBs that will be __fully__ loaded in and worked with (default argument is 2).  If the size of the GWAS summary statistics file is larger than _BIG_, _APSS.R_ will perform an exploratory read of the data first.  This will hopefully shorten runtime and handle GWAS summary statistics files larger than 10 GBs.
 
 
 ## Step 3: Conduct MWAS
 
+The script used to run MWAS is _MIMOSA-MWAS.R_.  There are five arguments for this script: 1) _path.ref_ is the pathway to your LD reference panel (we used the 1000 Genomes Project and downloaded from [1kG](https://www.internationalgenome.org/data)).  2) _trait_ is the name of the trait of interest.  This argument should be the same as the name of your GWAS summary statistics files (i.e. AST, using the example from earlier).  3) _path.trait_ is the pathway to your GWAS summary statistics.  4) _path.out_ is the pathway to wherever you'd like to save your results.  5) _path.weight_ is the pathway to the directory where you stored the MIMOSA models.
 
+Note that _MIMOSA-MWAS.R_ is currently set up to run across 300 parallel instances on a slurm cluster.  If you need to change this, you'll need to edit lines 1-2 that determine which of the 300 instances is running.  You'll probably want to still use the variable _id.job_ to store which instance is running, since it is referenced later in the code.  You would also need to edit the for loop on line 49 depending on how many jobs you're running.
 
-The main code used to train DNAm prediction models is _mainbody_cpp_rsid_precise_justCreateWeightsFinal.R_.  You'll only need to specify the _name\_batch_ argument, which is the desired output name.  This code produces a set of 900 potential imputation models at each CpG site, of which we select the best in step 3.  
+A slurm submission script, _MIMOSA-MWAS.sh_, is provided for ease of use.
 
-### Parallelizability
+### Output Format
 
-_mainbody_cpp_rsid_precise_justCreateWeightsFinal.R_ is parallel-friendly.  There is a small bit of code that guaranteees mutual exclusion for all subjobs, meaning you can run the code on as many parallel instances as needed and it will automatically detect unfinished jobs.  Note that it is currently set up to run on a slurm-based computing cluster, though this can be changed with minimal effort.  Simply edit lines 4-5 where the _job.id_ variable is defined.
-
-### Alignment
-
-| Data | Usage | Where to Find |
+| Column | Name | Description |
 | --- | --- | --- |
-| git status | List all new or modified files | fdfs |
+| 1 | CpG | Name of CpG site |
+| 2 | chromosome | Chromosome |
+| 3 | r2_test | R^2 for DNAm prediction model on test data |
+| 4 | p | p-value for MWAS |
+| 5 | z | z-score for MWAS |
+| 6 | runtime | Runtime |
+| 7 | pos | Position of CpG site |
 
-_mainbody_cpp_rsid_precise_justCreateWeightsFinal.R_ assumes that you want to align mQTL files by rsID, so you'll need to have rsIDs in your mQTL files.  
+## Disclaimer
 
+The DNAm prediction models and software are provided “as is”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. in no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the models or the use or other dealings in the models.
 
+## License
 
+Maintainer: Hunter Melton (hjm19d@fsu.edu)
 
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2013-present, Hunter Melton (hjm19d@fsu.edu), Zichen Zhang (zz17@fsu.edu), Chong Wu (cwu18@mdanderson.org)
