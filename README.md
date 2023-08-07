@@ -6,12 +6,12 @@ __MIMOSA__, or __MWAS Imputing Methylome Obliging Summary-level mQTLs and Associ
 
 If you use the MIMOSA models, please cite
 
-> Melton, H. J., Zhang, Z., Wu, L., & Wu, C. (2022). MIMOSA: A resource consisting of improved methylome imputation
-models increases power to identify CpG site-phenotype associations. Under Review.
+> Melton, H. J., Zhang, Z., Deng, H., Wu, L., & Wu, C. (2023). MIMOSA: A resource consisting of improved methylome imputation
+models increases power to identify CpG site-phenotype associations. _Briefings in Bioinformatics_.
 
 ## Step 1: Download DNAm prediction models
 
-The MIMOSA models for DNAm prediction in whole bllod are available on osf.io [here](https://osf.io/4swdq/?view_only=1e824972813a40e78d5af25f4b2c7154).  The files included are _cg********.rds_, which each consist of a set of weights for SNPs used in predicting DNAm at the CpG site cg*********.  Once you load one of these files into R, you'll have a list with elements 1) a dataframe with (among other things) mQTL p-value, rsID, chromosome, position (of SNP), a1, a2, CpG site, and position of CpG site; 2) a set of DNAm prediction weights corresponding to the SNPs in 1); 3) the prediction accuracy (R^2) of the model for the CpG site in the test dataset (which comes from the Framingham Heart Study).  Once you have the weights, you're halfway to running your MWAS.
+The MIMOSA models for DNAm prediction in whole blood are available on zenodo.org [here](https://zenodo.org/record/7325055).  The files included are _cg********.rds_, which each consists of a set of five weights for SNPs used in predicting DNAm at the CpG site cg*********.  Once you load one of these files into R, you'll have a list of five lists, with each corresponding to each of the penalized regression methods used to build the models (ElNet, MNet, SCAD, MCP, and LASSO).  Each of these lists will contain elements 1) TRUE/FALSE if this method produced a satisfactory DNAm prediction model; 2) a dataframe with (among other things) mQTL p-value, rsID, chromosome, position (of SNP), a1, a2, and CpG site; 2) a set of DNAm prediction weights corresponding to the SNPs in 1); 3) the prediction accuracy (R^2) of the model for the CpG site in the test dataset (which comes from the Framingham Heart Study).  Once you have the weights, you're halfway to running your MWAS.
 
 ## Step 2: Prepare GWAS Summary Statistics
 
@@ -30,7 +30,9 @@ _APSS.R_ is an interactive R function that helps you easily process and shape GW
 
 The script used to run MWAS is _MIMOSA-MWAS.R_.  There are five arguments for this script: 1) _path.ref_ is the pathway to your LD reference panel (we used the 1000 Genomes Project and downloaded from [here](https://www.internationalgenome.org/data)).  2) _trait_ is the name of the trait of interest.  This argument should be the same as the name of your GWAS summary statistics files (i.e. AST, using the example from earlier).  3) _path.trait_ is the pathway to your GWAS summary statistics.  4) _path.out_ is the pathway to wherever you'd like to save your results.  5) _path.weight_ is the pathway to the directory where you stored the MIMOSA models.
 
-Note that _MIMOSA-MWAS.R_ is currently set up to run across 300 parallel instances on a slurm cluster.  If you need to change this, you'll need to edit lines 1-2 that determine which of the 300 instances is running.  You'll probably want to still use the variable _id.job_ to store which instance is running, since it is referenced later in the code.  You would also need to edit the for loop on line 49 depending on how many jobs you're running.
+_MIMOSA-MWAS.R_ relies on a few other key scripts that should be in your working directory: _ACAT.R_ and _PatchUp.R_.  These are available to download from our Github page.  _MIMOSA-MWAS.R_ also requires the file _IlluminaHumanMethylation450kanno.rds_ (downloaded from Illumina's website) in your working directory to match positions to the CpG sites.
+
+Note that _MIMOSA-MWAS.R_ is currently set up to run across 300 parallel instances on a slurm cluster.  If you need to change this, you'll need to edit lines 1-2 that determine which of the 300 instances is running.  You'll probably want to still use the variable _id.job_ to store which instance is running, since it is referenced later in the code.  You would also need to edit the for loop on line 64 depending on how many jobs you're running.
 
 A slurm submission script, _MIMOSA-MWAS.sh_, is provided for ease of use.
 
@@ -38,13 +40,16 @@ A slurm submission script, _MIMOSA-MWAS.sh_, is provided for ease of use.
 
 | Column | Name | Description |
 | --- | --- | --- |
-| 1 | CpG | Name of CpG site |
-| 2 | chromosome | Chromosome |
-| 3 | r2_test | R^2 for DNAm prediction model on test data |
-| 4 | p | p-value for MWAS |
-| 5 | z | z-score for MWAS |
-| 6 | runtime | Runtime |
-| 7 | pos | Position of CpG site |
+| 1 | runtime | Runtime |
+| 2 | CpG | Name of CpG site |
+| 3 | chromosome | Chromosome |
+| 4 | model_best | Whichever of the 5 penalized regression models performed best at DNAm prediction on the test data |
+| 5 | r2_best | R^2 for best DNAm prediction model on test data |
+| 6-10 | p_Method | p-value for MWAS for each method |
+| 11-15 | z_Method | z-score for MWAS for each method |
+| 16 | p_Union | p-value of MWAS from best performing model (in terms of R^2 on testing data) |
+| 17 | p_ACAT | p-value from ACAT on all satistfactory models |
+| 18 | CpG_pos | Position of CpG site |
 
 ## Disclaimer
 
