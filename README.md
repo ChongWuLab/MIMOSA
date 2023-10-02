@@ -7,7 +7,7 @@ __MIMOSA__, or __MWAS Imputing Methylome Obliging Summary-level mQTLs and Associ
 If you use the MIMOSA models, please cite
 
 > Melton, H. J., Zhang, Z., Deng, H., Wu, L., & Wu, C. (2023). MIMOSA: A resource consisting of improved methylome imputation
-models increases power to identify CpG site-phenotype associations. _Briefings in Bioinformatics_.
+models increases power to identify CpG site-phenotype associations. 
 
 ## Step 1: Download DNAm prediction models
 
